@@ -14623,7 +14623,7 @@ VideoPlayer:
   m_TargetMaterialProperty: <noninit>
   m_RenderMode: 2
   m_AspectRatio: 2
-  m_DataSource: 0
+  m_DataSource: 1
   m_TimeUpdateMode: 1
   m_PlaybackSpeed: 1
   m_AudioOutputMode: 1
@@ -14631,7 +14631,7 @@ VideoPlayer:
   - {fileID: 676446349}
   m_DirectAudioVolumes:
   - 1
-  m_Url: 
+  m_Url: https://undeadpudu.rf.gd/ObeyTheWalrus/Video_Walrus.mp4
   m_EnabledAudioTracks: 01
   m_DirectAudioMutes: 00
   m_ControlledAudioTrackCount: 1
@@ -45644,7 +45644,7 @@ VideoPlayer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6390585820030519389}
   m_Enabled: 1
-  m_VideoClip: {fileID: 32900000, guid: 274539f758108564ab9191f5b477c74c, type: 3}
+  m_VideoClip: {fileID: 32900000, guid: 16b19d63a75b6bd4a9e52ef362aa3741, type: 3}
   m_TargetCameraAlpha: 1
   m_TargetCamera3DLayout: 0
   m_TargetCamera: {fileID: 0}
@@ -45654,7 +45654,7 @@ VideoPlayer:
   m_TargetMaterialProperty: <noninit>
   m_RenderMode: 2
   m_AspectRatio: 5
-  m_DataSource: 0
+  m_DataSource: 1
   m_TimeUpdateMode: 2
   m_PlaybackSpeed: 1
   m_AudioOutputMode: 2
@@ -45662,7 +45662,7 @@ VideoPlayer:
   - {fileID: 0}
   m_DirectAudioVolumes:
   - 1
-  m_Url: 
+  m_Url: https://undeadpudu.rf.gd/ObeyTheWalrus/Video_Paranoia.mp4
   m_EnabledAudioTracks: 01
   m_DirectAudioMutes: 00
   m_ControlledAudioTrackCount: 1
