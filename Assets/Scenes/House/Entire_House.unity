@@ -17824,7 +17824,7 @@ MonoBehaviour:
   postProcessVolume: {fileID: 832575518}
   paranoiaVideo: {fileID: 4539569865249147803}
   bloodRawImage: {fileID: 2258980573394133628}
-  dimensionSceneName: OtraDimension
+  dimensionSceneName: TheAnother
 --- !u!4 &855427779 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5558701797121993827, guid: 3df2c089cb00b184ca65b701025230fe, type: 3}
