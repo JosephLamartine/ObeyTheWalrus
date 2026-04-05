@@ -11,7 +11,9 @@ GameObject:
   - component: {fileID: 2516866290046835}
   - component: {fileID: 747773958542454864}
   - component: {fileID: 6120984859459997550}
-  m_Layer: 0
+  - component: {fileID: 7034343299072512175}
+  - component: {fileID: 3269414089491140148}
+  m_Layer: 3
   m_Name: Switch_Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26,7 +28,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4140291983868667365}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.5000008, y: 0.49999925, z: 0.49999928, w: 0.5000007}
+  m_LocalRotation: {x: -0.5, y: 0.5, z: 0.5, w: 0.5}
   m_LocalPosition: {x: 5.6609993, y: -1.8800001, z: -1}
   m_LocalScale: {x: 2.7976675, y: 2.7976675, z: 2.7976675}
   m_ConstrainProportionsScale: 0
@@ -90,3 +92,49 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &7034343299072512175
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4140291983868667365}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.08000042, y: 0.1, z: 0.11999992}
+  m_Center: {x: 0.00000016018747, y: -0.00000006181652, z: -0.00000008940697}
+--- !u!114 &3269414089491140148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4140291983868667365}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd5515b50f32fa140a75287585d4c01a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  interactionPrompt: '[E] to Turn Lights On'
+  spanishPrompt: '[E] Prender Luz'
+  prohibitedPrompt: I don't need it
+  prohibitedSpanishPrompt: No lo necesito
+  maxDistance: 5
+  canInteract: 1
+  canUseIt: 1
+  open_Prompt: '[E] to Turn Lights On'
+  open_SpanishPrompt: '[E] Prender Luz'
+  close_Prompt: '[E] to Turn Lights Off'
+  close_SpanishPrompt: '[E] Apagar Luz'
+  isOn: 1
+  lightToSwitch: Light_Dorm1

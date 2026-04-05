@@ -15,6 +15,8 @@ public class GameManager : MonoBehaviour
     }
     
     public Language language = Language.English;
+    public int storyStep = 0;
+    public bool isOnDialogue = false;
     
     public Action OnLanguageChanged;
     private void Awake()
@@ -62,5 +64,10 @@ public class GameManager : MonoBehaviour
     {
         language = newLanguage;
         OnLanguageChanged?.Invoke();
+    }
+
+    public void UpdateStoryStep(int newStoryStep)
+    {
+        storyStep = newStoryStep;
     }
 }

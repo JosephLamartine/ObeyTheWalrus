@@ -1,0 +1,15 @@
+{
+  "dialogues": [
+    {
+      "text": "La puerta se cerró detrás de ti...",
+      "audioClip": "Audio/Line_1",
+      "advanceMode": "audio"
+    },
+    {
+      "text": "¡¿Qué fue eso?!",
+      "audioClip": "Audio/Line_2",
+      "advanceMode": "audio",
+	  "onCompleteTrigger": "Llamada1"
+    }
+  ]
+}

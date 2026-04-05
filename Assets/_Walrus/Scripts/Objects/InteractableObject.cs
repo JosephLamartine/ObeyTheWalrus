@@ -5,21 +5,24 @@ using UnityEngine;
 public class InteractableObject : MonoBehaviour, IInteractable
 {
     [Header("Prompt")]
-    [SerializeField] private string interactionPrompt = "Press [E] to Interact";
-    [SerializeField] private string spanishPrompt = "[E] para Interactuar";
-
+    [SerializeField] public string interactionPrompt = "Press [E] to Interact";
+    [SerializeField] public string spanishPrompt = "[E] para Interactuar";
+    [Space(15)]
+    [SerializeField] public string prohibitedPrompt = "I don't need it";
+    [SerializeField] public string prohibitedSpanishPrompt = "No lo necesito";
+    
     [Header("Settings")]
-    [SerializeField] private float maxDistance = 4f;
-    [SerializeField] private bool canInteract = true;
+    [SerializeField] public float maxDistance = 4f;
+    [SerializeField] public bool canInteract = true;
+    [SerializeField] public bool canUseIt = true;
+    [SerializeField] private InteractionType interactionType = InteractionType.Interact;
 
+    
+    public InteractionType Type => interactionType; 
     public string GetInteractionPrompt() => interactionPrompt;
     public float MaxInteractionDistance => maxDistance;
     public bool CanInteract => canInteract;
-
-    public void OnEnable()
-    {
-        GameManager.Instance.OnLanguageChanged += EvaluateLanguage;
-    }
+    public bool CanUseIt => canUseIt;
     
     public void OnDisable()
     {
@@ -28,14 +31,31 @@ public class InteractableObject : MonoBehaviour, IInteractable
 
     private void Start()
     {
-        EvaluateLanguage();    
+        GameManager.Instance.OnLanguageChanged += EvaluateLanguage;
+        EvaluateLanguage();
+        EvaluateCanUseIt();
     }
     
     private void EvaluateLanguage()
     {
         if (GameManager.Instance.language == GameManager.Language.Spanish)
         {
-            interactionPrompt = spanishPrompt;    
+            interactionPrompt = spanishPrompt;
+        }
+    }
+    
+    private void EvaluateCanUseIt()
+    {
+        if (!canUseIt)
+        {
+            if (GameManager.Instance.language == GameManager.Language.Spanish)
+            {
+                interactionPrompt = prohibitedSpanishPrompt;
+            }
+            else if (GameManager.Instance.language == GameManager.Language.English)
+            {
+                interactionPrompt = prohibitedPrompt;
+            }
         }
     }
     

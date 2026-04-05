@@ -306,8 +306,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DoorInteractable
   interactionPrompt: Press [E] to Interact
   spanishPrompt: '[E] para Interactuar'
-  maxDistance: 4
+  maxDistance: 1
   canInteract: 1
+  isOpen: 0
+  open_Prompt: Press [E] to Open
+  open_SpanishPrompt: '[E] Abrir Puerta'
+  close_Prompt: Press [E] to Close
+  close_SpanishPrompt: '[E] Cerrar Puerta'
 --- !u!1 &5318353274399023808
 GameObject:
   m_ObjectHideFlags: 0

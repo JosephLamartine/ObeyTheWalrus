@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;   // <-- agregar
 using TMPro;
 using System.Collections;
 
@@ -7,10 +8,16 @@ public class PlayerInteraction : MonoBehaviour
     [Header("Configuración Horror FPS")]
     [SerializeField] private float interactionDistance = 4.5f;
     [SerializeField] private LayerMask interactableLayer;
-    
+
     [Header("UI Prompt")]
     [SerializeField] private CanvasGroup promptCanvasGroup;
     [SerializeField] private TextMeshProUGUI promptText;
+    [SerializeField] private Image interactionIcon;   
+
+    [Header("Interaction Icons")]
+    [SerializeField] private Sprite iconInteract;   
+    [SerializeField] private Sprite iconGrab;
+    [SerializeField] private Sprite iconExamine;
 
     [Header("Fade Settings")]
     [SerializeField] private float fadeSpeed = 8f;
@@ -19,7 +26,6 @@ public class PlayerInteraction : MonoBehaviour
     private IInteractable currentInteractable;
     private Coroutine fadeCoroutine;
 
-    // Input
     private PlayerInputActions inputActions;
     private bool interactInput;
 
@@ -29,13 +35,13 @@ public class PlayerInteraction : MonoBehaviour
 
         inputActions = new PlayerInputActions();
         inputActions.Player.Interact.performed += ctx => interactInput = true;
-        inputActions.Player.Interact.canceled += ctx => interactInput = false;
+        inputActions.Player.Interact.canceled  += ctx => interactInput = false;
 
         if (promptCanvasGroup != null)
             promptCanvasGroup.alpha = 0f;
     }
 
-    private void OnEnable() => inputActions.Enable();
+    private void OnEnable()  => inputActions.Enable();
     private void OnDisable() => inputActions.Disable();
 
     private void Update()
@@ -45,34 +51,28 @@ public class PlayerInteraction : MonoBehaviour
         if (currentInteractable != null && interactInput && currentInteractable.CanInteract)
         {
             currentInteractable.Interact();
-            interactInput = false; // Consumir el input
+            interactInput = false;
         }
     }
 
     private void CheckForInteractable()
     {
         IInteractable lookedAt = null;
-
         Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
 
         if (Physics.Raycast(ray, out RaycastHit hit, interactionDistance, interactableLayer))
-        {
             lookedAt = hit.collider.GetComponent<IInteractable>();
-        }
 
-        // === LÓGICA PRINCIPAL ===
         if (lookedAt != null && lookedAt.CanInteract)
         {
-            // Cambió de objeto o volvió a ser interactuable
             if (lookedAt != currentInteractable)
             {
                 currentInteractable = lookedAt;
-                ShowPrompt(lookedAt.GetInteractionPrompt());
+                ShowPrompt(lookedAt.GetInteractionPrompt(), lookedAt.Type);  // <-- pasa el tipo
             }
         }
         else
         {
-            // No hay nada interactuable mirando (o está bloqueado)
             if (currentInteractable != null)
             {
                 currentInteractable = null;
@@ -81,14 +81,25 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
-    private void ShowPrompt(string text)
+    private void ShowPrompt(string text, InteractionType type)
     {
         if (promptText != null)
             promptText.text = text;
 
+        // Swappear ícono según tipo
+        if (interactionIcon != null)
+            interactionIcon.sprite = GetSpriteForType(type);
+
         if (promptCanvasGroup != null)
             StartFade(1f);
     }
+
+    private Sprite GetSpriteForType(InteractionType type) => type switch
+    {
+        InteractionType.Grab    => iconGrab,
+        InteractionType.Examine => iconExamine,
+        _                       => iconInteract
+    };
 
     private void HidePrompt()
     {
@@ -98,16 +109,14 @@ public class PlayerInteraction : MonoBehaviour
 
     private void StartFade(float targetAlpha)
     {
-        if (fadeCoroutine != null)
-            StopCoroutine(fadeCoroutine);
-
+        if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
         fadeCoroutine = StartCoroutine(FadeCanvas(targetAlpha));
     }
 
     private IEnumerator FadeCanvas(float targetAlpha)
     {
         float startAlpha = promptCanvasGroup.alpha;
-        float elapsed = 0f;
+        float elapsed    = 0f;
 
         while (!Mathf.Approximately(promptCanvasGroup.alpha, targetAlpha))
         {

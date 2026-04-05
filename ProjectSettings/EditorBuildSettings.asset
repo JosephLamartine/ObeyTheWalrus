@@ -11,6 +11,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/House/Entire_House.unity
     guid: 5f62a55267ce6324ea3a6cfe8244892f
+  - enabled: 1
+    path: Assets/Scenes/House/TheAnother.unity
+    guid: dd490c09c3640934391d5642b44c3cb5
+  - enabled: 1
+    path: Assets/Scenes/House/Essentials.unity
+    guid: f099716fa2fbc344f95efbddb04e0dd9
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
