@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using System;
 public class GameManager : MonoBehaviour
 {
@@ -17,6 +18,7 @@ public class GameManager : MonoBehaviour
     public Language language = Language.English;
     public int storyStep = 0;
     public bool isOnDialogue = false;
+    public CanvasGroup controlHUD;
     
     public Action OnLanguageChanged;
     private void Awake()
@@ -30,6 +32,20 @@ public class GameManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+    }
+
+    public void ShowControlHUD()
+    {
+        controlHUD.alpha = 1;
+        controlHUD.blocksRaycasts = true;
+        controlHUD.interactable = true;
+    }
+    
+    public void HideControlHUD()
+    {
+        controlHUD.alpha = 0;
+        controlHUD.blocksRaycasts = false;
+        controlHUD.interactable = false;
     }
 
     // ==================== PAUSA ====================

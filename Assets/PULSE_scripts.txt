@@ -2901,9 +2901,9 @@ public class ParanoiaManager : MonoBehaviour
         if (string.IsNullOrEmpty(sceneName)) return false;
         for (int i = 0; i < SceneManager.sceneCountInBuildSettings; i++)
         {
-            //string path = SceneUtility.GetScenePathByIndex(i);
-            //string name = System.IO.Path.GetFileNameWithoutExtension(path);
-            //if (name == sceneName) return true;
+            string path = SceneManager.GetSceneByBuildIndex(i).path;
+            string name = System.IO.Path.GetFileNameWithoutExtension(path);
+            if (name == sceneName) return true;
         }
         return false;
     }
@@ -3029,11 +3029,6 @@ public class InteractableObject : MonoBehaviour, IInteractable
     public float MaxInteractionDistance => maxDistance;
     public bool CanInteract => canInteract;
     public bool CanUseIt => canUseIt;
-
-    public void OnEnable()
-    {
-        GameManager.Instance.OnLanguageChanged += EvaluateLanguage;
-    }
     
     public void OnDisable()
     {
@@ -3042,6 +3037,7 @@ public class InteractableObject : MonoBehaviour, IInteractable
 
     private void Start()
     {
+        GameManager.Instance.OnLanguageChanged += EvaluateLanguage;
         EvaluateLanguage();
         EvaluateCanUseIt();
     }
@@ -3267,20 +3263,21 @@ public class PhoneBehavior : MonoBehaviour
     public AudioClip sndCall;
     
     private PhoneInteractable scriptInteract;
-    private void OnEnable()
-    {
-        DialogueManager.Instance.RegisterEvent("Llamada1", OnLlamada1);
-    }
-
-    private void OnDisable()
-    {
-        DialogueManager.Instance.UnregisterEvent("Llamada1", OnLlamada1);
-    }
 
     private void Start()
     {
         au = GetComponent<AudioSource>();
         scriptInteract = GetComponent<PhoneInteractable>();
+
+        // Mover el registro aquÃ­, cuando DialogueManager.Instance ya existe seguro
+        DialogueManager.Instance.RegisterEvent("Llamada1", OnLlamada1);
+    }
+
+    private void OnDestroy()
+    {
+        // OnDestroy en lugar de OnDisable, mÃ¡s seguro para singletons
+        if (DialogueManager.Instance != null)
+            DialogueManager.Instance.UnregisterEvent("Llamada1", OnLlamada1);
     }
 
     private void OnLlamada1()
@@ -3493,14 +3490,19 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 moveInput;
     private Vector2 lookInput;
     private bool sprintInput;
+    
+    public bool lockCursor;
 
     private void Awake()
     {
         if (controller == null) controller = GetComponent<CharacterController>();
         
         // Cursor locked
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        if (lockCursor)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;   
+        }
 
         // Input
         inputActions = new PlayerInputActions();
