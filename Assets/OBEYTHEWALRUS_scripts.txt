@@ -129,6 +129,15 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""Flashlight"",
+                    ""type"": ""Button"",
+                    ""id"": ""f7ad67cf-fc4c-4382-ad3c-043bdc80c2f9"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""Crouch"",
                     ""type"": ""Button"",
                     ""id"": ""27c5f898-bc57-4ee1-8800-db469aca5fe3"",
@@ -141,7 +150,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""name"": ""Jump"",
                     ""type"": ""Button"",
                     ""id"": ""f1ba0d36-48eb-4cd5-b651-1c94a6531f70"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -314,17 +323,6 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Gamepad"",
-                    ""action"": ""Look"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""8c8e490b-c610-4785-884f-f04217b23ca4"",
-                    ""path"": ""<Pointer>/delta"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": "";Keyboard&Mouse;Touch"",
                     ""action"": ""Look"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -535,6 +533,28 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
                     ""action"": ""Interact"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""66ef02a8-78e2-4a79-93e3-201d31f44b09"",
+                    ""path"": ""<Keyboard>/F"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Flashlight"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""05d79a66-61d9-4914-8df6-92cce48aa700"",
+                    ""path"": ""<Gamepad>/buttonNorth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""Flashlight"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -1148,6 +1168,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Player_Look = m_Player.FindAction("Look", throwIfNotFound: true);
         m_Player_Attack = m_Player.FindAction("Attack", throwIfNotFound: true);
         m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
+        m_Player_Flashlight = m_Player.FindAction("Flashlight", throwIfNotFound: true);
         m_Player_Crouch = m_Player.FindAction("Crouch", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Previous = m_Player.FindAction("Previous", throwIfNotFound: true);
@@ -1250,6 +1271,7 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Look;
     private readonly InputAction m_Player_Attack;
     private readonly InputAction m_Player_Interact;
+    private readonly InputAction m_Player_Flashlight;
     private readonly InputAction m_Player_Crouch;
     private readonly InputAction m_Player_Jump;
     private readonly InputAction m_Player_Previous;
@@ -1282,6 +1304,10 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Interact".
         /// </summary>
         public InputAction @Interact => m_Wrapper.m_Player_Interact;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/Flashlight".
+        /// </summary>
+        public InputAction @Flashlight => m_Wrapper.m_Player_Flashlight;
         /// <summary>
         /// Provides access to the underlying input action "Player/Crouch".
         /// </summary>
@@ -1340,6 +1366,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Interact.started += instance.OnInteract;
             @Interact.performed += instance.OnInteract;
             @Interact.canceled += instance.OnInteract;
+            @Flashlight.started += instance.OnFlashlight;
+            @Flashlight.performed += instance.OnFlashlight;
+            @Flashlight.canceled += instance.OnFlashlight;
             @Crouch.started += instance.OnCrouch;
             @Crouch.performed += instance.OnCrouch;
             @Crouch.canceled += instance.OnCrouch;
@@ -1378,6 +1407,9 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
             @Interact.started -= instance.OnInteract;
             @Interact.performed -= instance.OnInteract;
             @Interact.canceled -= instance.OnInteract;
+            @Flashlight.started -= instance.OnFlashlight;
+            @Flashlight.performed -= instance.OnFlashlight;
+            @Flashlight.canceled -= instance.OnFlashlight;
             @Crouch.started -= instance.OnCrouch;
             @Crouch.performed -= instance.OnCrouch;
             @Crouch.canceled -= instance.OnCrouch;
@@ -1722,6 +1754,13 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnInteract(InputAction.CallbackContext context);
         /// <summary>
+        /// Method invoked when associated input action "Flashlight" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnFlashlight(InputAction.CallbackContext context);
+        /// <summary>
         /// Method invoked when associated input action "Crouch" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
@@ -1909,16 +1948,45 @@ using UnityEngine;
 
 public class CinematicSoundHandler : MonoBehaviour
 {
-    private AudioSource au;
-    
-    void Start()
-    {
-        au = GetComponent<AudioSource>();    
-    }
-
     public void PlaySound(AudioClip clip)
     {
-        au.PlayOneShot(clip);
+        AudioManager.Instance.PlaySFX(clip);
+    }
+}
+using UnityEngine;
+
+public class AudioManager : MonoBehaviour
+{
+    public static AudioManager Instance;
+
+    public AudioSource audioSource;
+
+    void Awake()
+    {
+        // Singleton
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
+        // AudioSource setup
+        audioSource = GetComponent<AudioSource>();
+        audioSource.playOnAwake = false;
+    }
+    
+    public void PlaySFX(AudioClip clip, float volume = 1f)
+    {
+        if (clip == null)
+        {
+            Debug.LogWarning("AudioManager: clip nulo");
+            return;
+        }
+
+        audioSource.PlayOneShot(clip, volume);
     }
 }
 using UnityEngine;
@@ -2207,6 +2275,7 @@ public class DialogueManager : MonoBehaviour
     }
 }
 using UnityEngine;
+using UnityEngine.UI;
 using System;
 public class GameManager : MonoBehaviour
 {
@@ -2225,6 +2294,7 @@ public class GameManager : MonoBehaviour
     public Language language = Language.English;
     public int storyStep = 0;
     public bool isOnDialogue = false;
+    public CanvasGroup controlHUD;
     
     public Action OnLanguageChanged;
     private void Awake()
@@ -2238,6 +2308,20 @@ public class GameManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+    }
+
+    public void ShowControlHUD()
+    {
+        controlHUD.alpha = 1;
+        controlHUD.blocksRaycasts = true;
+        controlHUD.interactable = true;
+    }
+    
+    public void HideControlHUD()
+    {
+        controlHUD.alpha = 0;
+        controlHUD.blocksRaycasts = false;
+        controlHUD.interactable = false;
     }
 
     // ==================== PAUSA ====================
@@ -2278,6 +2362,119 @@ public class GameManager : MonoBehaviour
     {
         storyStep = newStoryStep;
     }
+}
+using UnityEngine;
+using UnityEngine.Playables;
+using UnityEngine.UI;
+
+public class InteractionGate : MonoBehaviour
+{
+    public PlayableDirector director;
+    public GameObject button;
+
+    public void PlayDirector()
+    {
+        director.Play();
+        button.SetActive(false);
+    }
+
+}
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class InventoryManager : MonoBehaviour
+{
+    public static InventoryManager Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+
+    // ==================== ITEMS ====================
+    public bool hasFlashlight { get; private set; } = false;
+    public bool hasMap        { get; private set; } = false;
+    public float batteryLevel { get; private set; } = 1f; // 0 a 1
+
+    private HashSet<string> keys = new HashSet<string>(); // IDs de llaves
+
+    // ==================== EVENTOS ====================
+    public event Action OnInventoryChanged;         // cualquier cambio
+    public event Action<float> OnBatteryChanged;    // para actualizar UI baterÃ­a
+    public event Action<bool> OnFlashlightToggled;  // true = encendida
+
+    // ==================== FLASHLIGHT ====================
+    private bool flashlightOn = false;
+
+    public void PickupFlashlight()
+    {
+        hasFlashlight = true;
+        batteryLevel  = 1f;
+        OnInventoryChanged?.Invoke();
+    }
+
+    public void ToggleFlashlight()
+    {
+        if (!hasFlashlight || batteryLevel <= 0f) return;
+        flashlightOn = !flashlightOn;
+        OnFlashlightToggled?.Invoke(flashlightOn);
+    }
+
+    public bool IsFlashlightOn() => flashlightOn;
+
+    // Llamalo desde FlashlightBehavior en Update cuando estÃ¡ encendida
+    public void DrainBattery(float amount)
+    {
+        batteryLevel = Mathf.Clamp01(batteryLevel - amount);
+        OnBatteryChanged?.Invoke(batteryLevel);
+
+        if (batteryLevel <= 0f)
+        {
+            flashlightOn = false;
+            OnFlashlightToggled?.Invoke(false);
+        }
+    }
+
+    public void AddBattery(float amount)
+    {
+        batteryLevel = Mathf.Clamp01(batteryLevel + amount);
+        OnBatteryChanged?.Invoke(batteryLevel);
+        OnInventoryChanged?.Invoke();
+    }
+
+    // ==================== LLAVES ====================
+    public void AddKey(string keyID)
+    {
+        keys.Add(keyID);
+        OnInventoryChanged?.Invoke();
+        Debug.Log($"[Inventory] Llave obtenida: {keyID}");
+    }
+
+    public bool HasKey(string keyID) => keys.Contains(keyID);
+
+    public void UseKey(string keyID)
+    {
+        keys.Remove(keyID);
+        OnInventoryChanged?.Invoke();
+        Debug.Log($"[Inventory] Llave usada: {keyID}");
+    }
+
+    // ==================== MAPA ====================
+    public void PickupMap()
+    {
+        hasMap = true;
+        OnInventoryChanged?.Invoke();
+    }
+
+    // ==================== SHOW / HIDE ====================
+    public event Action OnShowInventory;
+    public event Action OnHideInventory;
+
+    public void ShowInventory() => OnShowInventory?.Invoke();
+    public void HideInventory() => OnHideInventory?.Invoke();
 }
 using System.Collections.Generic;
 using UnityEngine;
@@ -3004,6 +3201,131 @@ public class DoorInteractable : InteractableObject
         base.DisableInteract();
     }
 }
+using UnityEngine;
+
+public class FlashlightBehavior : MonoBehaviour
+{
+    [Header("Referencias")]
+    [SerializeField] private Light flashlightLight;
+
+    [Header("Sway & Lag")]
+    [SerializeField] private float swayAmount    = 0.04f;
+    [SerializeField] private float swaySmoothing = 8f;
+
+    [Header("Bob al caminar")]
+    [SerializeField] private float bobFrequency  = 8f;
+    [SerializeField] private float bobAmplitudeY = 0.015f;
+    [SerializeField] private float bobAmplitudeX = 0.008f;
+
+    [Header("BaterÃ­a")]
+    [SerializeField] private float drainPerSecond = 0.015f;
+
+    private Vector3 initialLocalPos;
+    private float   bobTimer = 0f;
+    private CharacterController cc;
+
+    private PlayerInputActions inputActions;
+    private Vector2 lookInput; // para el sway sin Input.GetAxis
+
+    private void Awake()
+    {
+        inputActions = new PlayerInputActions();
+        
+        inputActions.Player.Flashlight.performed += ctx =>
+        {
+            if (InventoryManager.Instance.hasFlashlight)
+                InventoryManager.Instance.ToggleFlashlight();
+        };
+
+        // Reutilizamos el Look para el sway, sin depender de Input.GetAxis
+        inputActions.Player.Look.performed += ctx => lookInput = ctx.ReadValue<Vector2>();
+        inputActions.Player.Look.canceled  += ctx => lookInput = Vector2.zero;
+    }
+
+    private void OnEnable()  => inputActions.Enable();
+    private void OnDisable() => inputActions.Disable();
+
+    private void Start()
+    {
+        initialLocalPos = transform.localPosition;
+        cc = GetComponentInParent<CharacterController>();
+
+        // DEBUG
+        InventoryManager.Instance.PickupFlashlight();
+
+        if (flashlightLight != null)
+            flashlightLight.enabled = false;
+
+        InventoryManager.Instance.OnFlashlightToggled += SetLight;
+    }
+
+    private void OnDestroy()
+    {
+        if (InventoryManager.Instance != null)
+            InventoryManager.Instance.OnFlashlightToggled -= SetLight;
+    }
+
+    private void Update()
+    {
+        if (!InventoryManager.Instance.hasFlashlight) return;
+
+        HandleSway();
+        HandleBob();
+        HandleDrain();
+    }
+
+    private void HandleSway()
+    {
+        Vector3 swayTarget = new Vector3(
+            initialLocalPos.x - lookInput.x * swayAmount,
+            initialLocalPos.y - lookInput.y * swayAmount,
+            initialLocalPos.z
+        );
+
+        transform.localPosition = Vector3.Lerp(
+            transform.localPosition,
+            swayTarget,
+            swaySmoothing * Time.deltaTime
+        );
+    }
+
+    private void HandleBob()
+    {
+        bool isMoving = cc != null && cc.velocity.magnitude > 0.1f && cc.isGrounded;
+
+        if (isMoving)
+        {
+            bobTimer += Time.deltaTime * bobFrequency;
+
+            transform.localPosition = new Vector3(
+                initialLocalPos.x + Mathf.Cos(bobTimer)            * bobAmplitudeX,
+                initialLocalPos.y + Mathf.Abs(Mathf.Sin(bobTimer)) * bobAmplitudeY,
+                initialLocalPos.z
+            );
+        }
+        else
+        {
+            bobTimer = 0f;
+            transform.localPosition = Vector3.Lerp(
+                transform.localPosition,
+                initialLocalPos,
+                swaySmoothing * Time.deltaTime
+            );
+        }
+    }
+
+    private void HandleDrain()
+    {
+        if (InventoryManager.Instance.IsFlashlightOn())
+            InventoryManager.Instance.DrainBattery(drainPerSecond * Time.deltaTime);
+    }
+
+    private void SetLight(bool state)
+    {
+        if (flashlightLight != null)
+            flashlightLight.enabled = state;
+    }
+}
 using System;
 using UnityEngine;
 
@@ -3471,60 +3793,93 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Transform cameraTransform;
 
     [Header("Movimiento")]
-    [SerializeField] private float walkSpeed = 5f;
+    [SerializeField] private float walkSpeed   = 5f;
     [SerializeField] private float sprintSpeed = 8f;
-    [SerializeField] private float gravity = -19.62f;
-    [SerializeField] private float jumpHeight = 2.5f;
+    [SerializeField] private float gravity     = -19.62f;
+    [SerializeField] private float jumpHeight  = 2.5f;
 
     [Header("Mirar")]
-    [SerializeField] private float mouseSensitivity = 2f;
-    [SerializeField] private float verticalLookRange = 80f; // Â±80Â°
+    [SerializeField] private float mouseSensitivity   = 2f;
+    [SerializeField] private float gamepadSensitivity = 180f; // para stick / virtual joystick
+    [SerializeField] private float verticalLookRange  = 80f;
 
-    // Variables de estado
+    [Header("Camera Bob")]
+    [SerializeField] private float walkBobFrequency    = 8f;
+    [SerializeField] private float walkBobAmplitudeY   = 0.05f;
+    [SerializeField] private float walkBobAmplitudeX   = 0.025f;
+    [SerializeField] private float sprintBobFrequency  = 14f;
+    [SerializeField] private float sprintBobAmplitudeY = 0.09f;
+    [SerializeField] private float sprintBobAmplitudeX = 0.045f;
+    [SerializeField] private float bobSmoothing        = 10f;
+
+    [Header("Pasos")]
+    [SerializeField] private AudioSource footstepSource;
+    [SerializeField] private AudioClip[] walkStepClips;
+    [SerializeField] private AudioClip[] sprintStepClips;
+    [SerializeField] private float walkStepInterval   = 0.5f;
+    [SerializeField] private float sprintStepInterval = 0.32f;
+    [Range(0f, 1f)]
+    [SerializeField] private float footstepVolume = 0.6f;
+
+    // estado
     private Vector3 playerVelocity;
-    private bool isGrounded;
-    private float verticalLookRotation = 0f;
+    private bool    isGrounded;
+    private float   verticalLookRotation = 0f;
 
-    // Input
+    // bob
+    private Vector3 cameraInitialLocalPos;
+    private float   bobTimer = 0f;
+
+    // pasos
+    private float stepTimer     = 0f;
+    private int   lastStepIndex = -1;
+
+    // input
     private PlayerInputActions inputActions;
     private Vector2 moveInput;
     private Vector2 lookInput;
-    private bool sprintInput;
-    
-    public bool lockCursor;
+    private bool    sprintInput;
+    private bool    usingStick = false; // true = gamepad/virtual stick, false = mouse
+    public  bool    lockCursor;
 
     private void Awake()
     {
         if (controller == null) controller = GetComponent<CharacterController>();
-        
-        // Cursor locked
+
         if (lockCursor)
         {
             Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;   
+            Cursor.visible   = false;
         }
 
-        // Input
         inputActions = new PlayerInputActions();
-        
-        inputActions.Player.Move.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
-        inputActions.Player.Move.canceled += ctx => moveInput = Vector2.zero;
-        
-        inputActions.Player.Look.performed += ctx => lookInput = ctx.ReadValue<Vector2>();
-        inputActions.Player.Look.canceled += ctx => lookInput = Vector2.zero;
-        
+
+        inputActions.Player.Move.performed   += ctx => moveInput   = ctx.ReadValue<Vector2>();
+        inputActions.Player.Move.canceled    += ctx => moveInput   = Vector2.zero;
+
+        inputActions.Player.Look.performed   += ctx =>
+        {
+            lookInput  = ctx.ReadValue<Vector2>();
+            // Detectar si viene de stick (controlPath contiene "Stick" o "rightStick")
+            usingStick = ctx.control.path.Contains("Stick") || ctx.control.path.Contains("stick");
+        };
+        inputActions.Player.Look.canceled    += ctx =>
+        {
+            lookInput  = Vector2.zero;
+            usingStick = false;
+        };
+
         inputActions.Player.Sprint.performed += ctx => sprintInput = true;
-        inputActions.Player.Sprint.canceled += ctx => sprintInput = false;
+        inputActions.Player.Sprint.canceled  += ctx => sprintInput = false;
     }
 
-    private void OnEnable()
-    {
-        inputActions.Enable();
-    }
+    private void OnEnable()  => inputActions.Enable();
+    private void OnDisable() => inputActions.Disable();
 
-    private void OnDisable()
+    private void Start()
     {
-        inputActions.Disable();
+        cameraInitialLocalPos = cameraTransform.localPosition;
+        GameManager.Instance.ShowControlHUD();
     }
 
     private void Update()
@@ -3532,47 +3887,118 @@ public class PlayerMovement : MonoBehaviour
         isGrounded = controller.isGrounded;
 
         if (isGrounded && playerVelocity.y < 0)
-        {
-            playerVelocity.y = -2f; // pequeÃ±o valor negativo para mantenerlo pegado al suelo
-        }
+            playerVelocity.y = -2f;
 
         // â”€â”€ MOVIMIENTO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         Vector3 moveDirection = transform.right * moveInput.x + transform.forward * moveInput.y;
-        float currentSpeed = sprintInput ? sprintSpeed : walkSpeed;
+        float   currentSpeed  = sprintInput ? sprintSpeed : walkSpeed;
 
-        Vector3 move = moveDirection.normalized * currentSpeed * Time.deltaTime;
-        controller.Move(move);
-
-        // â”€â”€ GRAVEDAD y SALTO (opcional, descomenta si quieres salto) â”€â”€
-        // if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded)
-        // {
-        //     playerVelocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-        // }
+        controller.Move(moveDirection.normalized * currentSpeed * Time.deltaTime);
 
         playerVelocity.y += gravity * Time.deltaTime;
         controller.Move(playerVelocity * Time.deltaTime);
 
-        // â”€â”€ MIRAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        float mouseX = lookInput.x * mouseSensitivity;
-        float mouseY = lookInput.y * mouseSensitivity;
+        // â”€â”€ MIRAR â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        float lookX;
+        float lookY;
 
-        // RotaciÃ³n vertical (cÃ¡mara)
-        verticalLookRotation -= mouseY;
-        verticalLookRotation = Mathf.Clamp(verticalLookRotation, -verticalLookRange, verticalLookRange);
+        if (usingStick)
+        {
+            // Stick/virtual joystick: valores -1 a 1, necesita Time.deltaTime
+            lookX = lookInput.x * gamepadSensitivity * Time.deltaTime;
+            lookY = lookInput.y * gamepadSensitivity * Time.deltaTime;
+        }
+        else
+        {
+            // Mouse: delta ya es frame-relative, no necesita Time.deltaTime
+            lookX = lookInput.x * mouseSensitivity;
+            lookY = lookInput.y * mouseSensitivity;
+        }
 
+        verticalLookRotation -= lookY;
+        verticalLookRotation  = Mathf.Clamp(verticalLookRotation, -verticalLookRange, verticalLookRange);
         cameraTransform.localRotation = Quaternion.Euler(verticalLookRotation, 0f, 0f);
+        transform.Rotate(Vector3.up * lookX);
 
-        // RotaciÃ³n horizontal (cuerpo entero)
-        transform.Rotate(Vector3.up * mouseX);
+        // â”€â”€ BOB + PASOS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        bool isMoving = moveInput.sqrMagnitude > 0.01f && isGrounded;
+
+        if (isMoving)
+        {
+            HandleCameraBob();
+            HandleFootsteps();
+        }
+        else
+        {
+            ResetCameraBob();
+            stepTimer = 0f;
+        }
     }
 
-    // Opcional: para debug
+    // â”€â”€ CAMERA BOB â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    private void HandleCameraBob()
+    {
+        float freq = sprintInput ? sprintBobFrequency  : walkBobFrequency;
+        float ampY = sprintInput ? sprintBobAmplitudeY : walkBobAmplitudeY;
+        float ampX = sprintInput ? sprintBobAmplitudeX : walkBobAmplitudeX;
+
+        bobTimer += Time.deltaTime * freq;
+
+        Vector3 bobOffset = new Vector3(
+            Mathf.Cos(bobTimer * 0.5f)       * ampX,
+            Mathf.Abs(Mathf.Sin(bobTimer))   * ampY,
+            0f
+        );
+
+        cameraTransform.localPosition = Vector3.Lerp(
+            cameraTransform.localPosition,
+            cameraInitialLocalPos + bobOffset,
+            bobSmoothing * Time.deltaTime
+        );
+    }
+
+    private void ResetCameraBob()
+    {
+        bobTimer = 0f;
+        cameraTransform.localPosition = Vector3.Lerp(
+            cameraTransform.localPosition,
+            cameraInitialLocalPos,
+            bobSmoothing * Time.deltaTime
+        );
+    }
+
+    // â”€â”€ FOOTSTEPS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    private void HandleFootsteps()
+    {
+        float interval = sprintInput ? sprintStepInterval : walkStepInterval;
+        stepTimer += Time.deltaTime;
+
+        if (stepTimer >= interval)
+        {
+            stepTimer = 0f;
+            PlayFootstep();
+        }
+    }
+
+    private void PlayFootstep()
+    {
+        if (footstepSource == null) return;
+
+        AudioClip[] clips = sprintInput ? sprintStepClips : walkStepClips;
+        if (clips == null || clips.Length == 0) return;
+
+        int index;
+        do { index = Random.Range(0, clips.Length); }
+        while (clips.Length > 1 && index == lastStepIndex);
+
+        lastStepIndex = index;
+        footstepSource.PlayOneShot(clips[index], footstepVolume);
+    }
+
     private void OnDrawGizmosSelected()
     {
-        if (controller != null)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position + controller.center, controller.radius);
-        }
+        if (controller == null) return;
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position + controller.center, controller.radius);
     }
 }

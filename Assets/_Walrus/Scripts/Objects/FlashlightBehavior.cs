@@ -18,7 +18,7 @@ public class FlashlightBehavior : MonoBehaviour
     [SerializeField] private float drainPerSecond = 0.015f;
 
     private Vector3 initialLocalPos;
-    private float   bobTimer = 0f;
+    private float bobTimer = 0f;
     private CharacterController cc;
 
     private PlayerInputActions inputActions;
