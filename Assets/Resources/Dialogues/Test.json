@@ -1,15 +1,15 @@
 {
   "dialogues": [
     {
-      "text": "La puerta se cerró detrás de ti...",
+      "text": "¿Cómo se prendió esta cuestión?",
       "audioClip": "Audio/Line_1",
       "advanceMode": "audio"
     },
     {
-      "text": "¡¿Qué fue eso?!",
+      "text": "Qué chucha...",
       "audioClip": "Audio/Line_2",
       "advanceMode": "audio",
-	  "onCompleteTrigger": "Llamada1"
+	  "onCompleteTrigger": "StartRingtone"
     }
   ]
 }

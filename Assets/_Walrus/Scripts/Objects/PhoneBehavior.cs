@@ -4,7 +4,7 @@ using UnityEngine;
 public class PhoneBehavior : MonoBehaviour
 {
     private AudioSource au;
-    public AudioClip sndCall;
+    public AudioClip sndRingtone;
     
     private PhoneInteractable scriptInteract;
 
@@ -14,19 +14,25 @@ public class PhoneBehavior : MonoBehaviour
         scriptInteract = GetComponent<PhoneInteractable>();
 
         // Mover el registro aquí, cuando DialogueManager.Instance ya existe seguro
-        DialogueManager.Instance.RegisterEvent("Llamada1", OnLlamada1);
+        DialogueManager.Instance.RegisterEvent("StartRingtone", StartRingtone);
     }
 
     private void OnDestroy()
     {
         // OnDestroy en lugar de OnDisable, más seguro para singletons
         if (DialogueManager.Instance != null)
-            DialogueManager.Instance.UnregisterEvent("Llamada1", OnLlamada1);
+            DialogueManager.Instance.UnregisterEvent("StartRingtone", StartRingtone);
     }
 
-    private void OnLlamada1()
+    private void StartRingtone()
     {
-        au.PlayOneShot(sndCall);
+        au.clip = sndRingtone;
+        au.Play();
         scriptInteract.canInteract = true;
+    }
+
+    public void StopRingtone()
+    {
+        au.Stop();
     }
 }

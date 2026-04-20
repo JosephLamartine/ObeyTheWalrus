@@ -3,9 +3,11 @@ using UnityEngine;
 public class DoorInteractable : InteractableObject
 {
     private Animator anim;
+    
+    [Header("Door Settings")]
     public bool isOpen = false;
     
-    [Header("Prompt")]
+    [Header("Close/Open Prompt")]
     [SerializeField] private string open_Prompt = "Press [E] to Open";
     [SerializeField] private string open_SpanishPrompt = "[E] Abrir Puerta";
     [Space(15)]

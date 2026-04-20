@@ -4,12 +4,16 @@ using UnityEngine;
 [RequireComponent(typeof(Collider))]
 public class InteractableObject : MonoBehaviour, IInteractable
 {
+    public enum Indicator
+    {
+        None,
+        Show,
+        Hide
+    }
+    
     [Header("Prompt")]
     [SerializeField] public string interactionPrompt = "Press [E] to Interact";
     [SerializeField] public string spanishPrompt = "[E] para Interactuar";
-    [Space(15)]
-    [SerializeField] public string prohibitedPrompt = "I don't need it";
-    [SerializeField] public string prohibitedSpanishPrompt = "No lo necesito";
     
     [Header("Settings")]
     [SerializeField] public float maxDistance = 4f;
@@ -17,12 +21,15 @@ public class InteractableObject : MonoBehaviour, IInteractable
     [SerializeField] public bool canUseIt = true;
     [SerializeField] private InteractionType interactionType = InteractionType.Interact;
 
+    [Header("Indicators")]
+    public Indicator indicator = Indicator.None;
+    public IndicatorsHandler indicatorsHandler;
+    public int indicatorIndex = 0;
     
     public InteractionType Type => interactionType; 
     public string GetInteractionPrompt() => interactionPrompt;
     public float MaxInteractionDistance => maxDistance;
     public bool CanInteract => canInteract;
-    public bool CanUseIt => canUseIt;
     
     public void OnDisable()
     {
@@ -33,7 +40,6 @@ public class InteractableObject : MonoBehaviour, IInteractable
     {
         GameManager.Instance.OnLanguageChanged += EvaluateLanguage;
         EvaluateLanguage();
-        EvaluateCanUseIt();
     }
     
     private void EvaluateLanguage()
@@ -44,24 +50,22 @@ public class InteractableObject : MonoBehaviour, IInteractable
         }
     }
     
-    private void EvaluateCanUseIt()
-    {
-        if (!canUseIt)
-        {
-            if (GameManager.Instance.language == GameManager.Language.Spanish)
-            {
-                interactionPrompt = prohibitedSpanishPrompt;
-            }
-            else if (GameManager.Instance.language == GameManager.Language.English)
-            {
-                interactionPrompt = prohibitedPrompt;
-            }
-        }
-    }
-    
     public virtual void Interact()
     {
         Debug.Log($"<color=red>INTERACT:</color> {gameObject.name}");
+        
+        if (indicator != Indicator.None)
+        {
+            switch (indicator)
+            {
+                case Indicator.Show:
+                    indicatorsHandler.indicator[indicatorIndex].SetActive(true);
+                    break;
+                case Indicator.Hide:
+                    indicatorsHandler.indicator[indicatorIndex].SetActive(false);
+                    break;
+            }
+        }
     }
     
     public virtual void EnableInteract()

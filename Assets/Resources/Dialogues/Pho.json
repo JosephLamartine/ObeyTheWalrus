@@ -1,0 +1,34 @@
+{
+  "dialogues": [
+    {
+      "text": "¿Aló?",
+      "audioClip": "Audio/PhoneCall_Line_1",
+      "advanceMode": "audio"
+    },
+	    {
+      "text": "Madre: Hijo...",
+      "audioClip": "Audio/PhoneCall_Line_2",
+      "advanceMode": "audio"
+    },
+	    {
+      "text": "¿Si? ¿Qué pasó?",
+      "audioClip": "Audio/PhoneCall_Line_3",
+      "advanceMode": "audio"
+    },
+	    {
+      "text": "Madre: El papá se quedó en pana.",
+      "audioClip": "Audio/PhoneCall_Line_4",
+      "advanceMode": "audio"
+    },
+	    {
+      "text": "Chuta ¿Qué van a hacer?",
+      "audioClip": "Audio/PhoneCall_Line_5",
+      "advanceMode": "audio"
+    },
+		    {
+      "text": "Madre: Bueno, pedimos que nos lleve una grúa a peñablanca.",
+      "audioClip": "Audio/PhoneCall_Line_6",
+      "advanceMode": "audio"
+    }
+  ]
+}

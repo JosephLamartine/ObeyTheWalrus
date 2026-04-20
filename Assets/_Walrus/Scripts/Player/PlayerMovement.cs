@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.UI; // ← Agregado para los sliders
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviour
@@ -10,163 +9,89 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Transform cameraTransform;
 
     [Header("Movimiento")]
-    [SerializeField] private float walkSpeed   = 5f;
+    [SerializeField] private float walkSpeed = 5f;
     [SerializeField] private float sprintSpeed = 8f;
-    [SerializeField] private float gravity     = -19.62f;
-    [SerializeField] private float jumpHeight  = 2.5f;
+    [SerializeField] private float gravity = -19.62f;
 
     [Header("Mirar")]
-    [SerializeField] private float mouseSensitivity   = 2f;
-    [SerializeField] private float gamepadSensitivity = 180f; // para stick / virtual joystick en Android
-
-    [SerializeField] private float verticalLookRange  = 80f;
+    [SerializeField] private float mouseSensitivity = 2f;
+    [SerializeField] private float gamepadSensitivity = 180f;
+    [SerializeField] private float verticalLookRange = 80f;
 
     [Header("Camera Bob")]
-    [SerializeField] private float walkBobFrequency    = 8f;
-    [SerializeField] private float walkBobAmplitudeY   = 0.05f;
-    [SerializeField] private float walkBobAmplitudeX   = 0.025f;
-    [SerializeField] private float sprintBobFrequency  = 14f;
+    [SerializeField] private float walkBobFrequency = 8f;
+    [SerializeField] private float walkBobAmplitudeY = 0.05f;
+    [SerializeField] private float walkBobAmplitudeX = 0.025f;
+    [SerializeField] private float sprintBobFrequency = 14f;
     [SerializeField] private float sprintBobAmplitudeY = 0.09f;
     [SerializeField] private float sprintBobAmplitudeX = 0.045f;
-    [SerializeField] private float bobSmoothing        = 10f;
+    [SerializeField] private float bobSmoothing = 10f;
 
     [Header("Pasos")]
     [SerializeField] private AudioSource footstepSource;
     [SerializeField] private AudioClip[] walkStepClips;
     [SerializeField] private AudioClip[] sprintStepClips;
-    [SerializeField] private float walkStepInterval   = 0.5f;
+    [SerializeField] private float walkStepInterval = 0.5f;
     [SerializeField] private float sprintStepInterval = 0.32f;
-    [Range(0f, 1f)]
-    [SerializeField] private float footstepVolume = 0.6f;
+    [Range(0f, 1f)] [SerializeField] private float footstepVolume = 0.6f;
 
-    [Header("UI y Controles por Plataforma")]
-    [Tooltip("Canvas o GameObject con los controles en pantalla (joystick virtual, etc.). Se activa solo en Android.")]
-    [SerializeField] private GameObject mobileControlsUI;
-
-    [Tooltip("Slider para ajustar sensibilidad del MOUSE en PC/Windows/Editor")]
-    [SerializeField] private Slider mouseSensitivitySlider;
-
-    [Tooltip("Slider para ajustar sensibilidad del STICK en Android")]
-    [SerializeField] private Slider androidSensitivitySlider;
-    
-    [SerializeField] private GameObject inventoryUI;
-
-    // estado
     private Vector3 playerVelocity;
-    private bool    isGrounded;
-    private float   verticalLookRotation = 0f;
+    private bool isGrounded;
+    private float verticalLookRotation = 0f;
 
-    // bob
     private Vector3 cameraInitialLocalPos;
-    private float   bobTimer = 0f;
+    private float bobTimer = 0f;
 
-    // pasos
-    private float stepTimer     = 0f;
-    private int   lastStepIndex = -1;
+    private float stepTimer = 0f;
+    private int lastStepIndex = -1;
 
-    // input
     private PlayerInputActions inputActions;
     private Vector2 moveInput;
     private Vector2 lookInput;
-    private bool    sprintInput;
-    private bool    usingStick = false;
+    private bool sprintInput;
+    private bool usingStick = false;
 
-    private bool    isAndroidPlatform; // ← Detecta automáticamente Android
-    public  bool    lockCursor;        // sigue funcionando solo en PC
-    
-    // ── Propiedades públicas para PlayerStamina ──────────────────────
+    private bool isAndroidPlatform;
+    public bool lockCursor;
+
     public bool SprintInput => sprintInput;
-    public bool IsMoving    => moveInput.sqrMagnitude > 0.01f && isGrounded;
+    public bool IsMoving => moveInput.sqrMagnitude > 0.01f && isGrounded;
+
     private PlayerStamina staminaSystem;
 
     private void Awake()
     {
         if (controller == null) controller = GetComponent<CharacterController>();
-        
         staminaSystem = GetComponent<PlayerStamina>();
-        
+
         inputActions = new PlayerInputActions();
 
-        // Movimiento y Sprint (sin cambios)
-        inputActions.Player.Move.performed   += ctx => moveInput   = ctx.ReadValue<Vector2>();
-        inputActions.Player.Move.canceled    += ctx => moveInput   = Vector2.zero;
+        inputActions.Player.Move.performed += ctx => moveInput = ctx.ReadValue<Vector2>();
+        inputActions.Player.Move.canceled += ctx => moveInput = Vector2.zero;
 
         inputActions.Player.Sprint.performed += ctx => sprintInput = true;
-        inputActions.Player.Sprint.canceled  += ctx => sprintInput = false;
+        inputActions.Player.Sprint.canceled += ctx => sprintInput = false;
 
-        // ←←← LOOK CON WORKAROUND PARA ANDROID ←←←
         inputActions.Player.Look.performed += OnLookPerformed;
-        inputActions.Player.Look.canceled  += OnLookCanceled;
+        inputActions.Player.Look.canceled += OnLookCanceled;
 
-        // Detectamos plataforma YA en Awake (funciona en Editor, Build Windows y Build Android)
         isAndroidPlatform = Application.platform == RuntimePlatform.Android;
     }
 
-    // ====================== WORKAROUND PARA POINTER DELTA ======================
-    // Este es el núcleo de la solución:
-    // - Mantuviste el binding "Pointer/Delta" (o Mouse/Delta) en tu Input Actions asset.
-    // - En Android ignoramos cualquier input que venga de Pointer/Mouse (porque el touch del dedo activa Pointer Delta y "jodía todo").
-    // - En PC/Editor/Windows el Pointer es el mouse → funciona perfectamente.
-    // - El virtual joystick (que usas como Stick) sigue funcionando en Android.
-    private void OnLookPerformed(InputAction.CallbackContext ctx)
-    {
-        string path = ctx.control.path.ToLowerInvariant();
-
-        // Ignoramos Pointer/Mouse SOLO en Android (esto es el fix)
-        if (isAndroidPlatform && (path.Contains("pointer") || path.Contains("mouse")))
-            return;
-
-        lookInput  = ctx.ReadValue<Vector2>();
-        usingStick = path.Contains("stick"); // tu detección original de stick/virtual joystick
-    }
-
-    private void OnLookCanceled(InputAction.CallbackContext ctx)
-    {
-        string path = ctx.control.path.ToLowerInvariant();
-
-        if (isAndroidPlatform && (path.Contains("pointer") || path.Contains("mouse")))
-            return;
-
-        lookInput  = Vector2.zero;
-        usingStick = false;
-    }
-    // ===========================================================================
-
-    private void OnEnable()  => inputActions.Enable();
+    private void OnEnable() => inputActions.Enable();
     private void OnDisable() => inputActions.Disable();
 
     private void Start()
     {
         cameraInitialLocalPos = cameraTransform.localPosition;
-
-        // Activamos/desactivamos controles en pantalla y UI según plataforma
-        if (mobileControlsUI != null)
-            mobileControlsUI.SetActive(isAndroidPlatform);
-
-        // Cursor solo en PC (en Android no tiene sentido)
+    
         if (!isAndroidPlatform && lockCursor)
         {
             Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible   = false;
-        }
-        
-        //Activar UI de Inventario
-        inventoryUI.SetActive(true);
-        
-        // Sidequest: Sliders de sensibilidad (funcionan en ambas plataformas)
-        if (mouseSensitivitySlider != null)
-        {
-            mouseSensitivitySlider.value = mouseSensitivity;
-            mouseSensitivitySlider.onValueChanged.AddListener(value => mouseSensitivity = value);
+            Cursor.visible = false;
         }
 
-        if (androidSensitivitySlider != null)
-        {
-            androidSensitivitySlider.value = gamepadSensitivity;
-            androidSensitivitySlider.onValueChanged.AddListener(value => gamepadSensitivity = value);
-        }
-
-        GameManager.Instance.ShowControlHUD();
+        UI_Master.Instance.ShowInventoryHUD();
     }
 
     private void Update()
@@ -176,8 +101,9 @@ public class PlayerMovement : MonoBehaviour
         if (isGrounded && playerVelocity.y < 0)
             playerVelocity.y = -2f;
 
-        // ── MOVIMIENTO ───────────────────────────────────────────────
+        // MOVIMIENTO
         Vector3 moveDirection = transform.right * moveInput.x + transform.forward * moveInput.y;
+
         bool canSprint = staminaSystem == null || staminaSystem.IsSprintAllowed;
         float currentSpeed = (sprintInput && canSprint) ? sprintSpeed : walkSpeed;
 
@@ -186,29 +112,10 @@ public class PlayerMovement : MonoBehaviour
         playerVelocity.y += gravity * Time.deltaTime;
         controller.Move(playerVelocity * Time.deltaTime);
 
-        // ── MIRAR (usa las sensibilidades correctas según stick/mouse) ────────────────────────────────────────────────────
-        float lookX;
-        float lookY;
+        // MIRAR
+        HandleLook();
 
-        if (usingStick)
-        {
-            // Stick / virtual joystick (Android) → necesita Time.deltaTime
-            lookX = lookInput.x * gamepadSensitivity * Time.deltaTime;
-            lookY = lookInput.y * gamepadSensitivity * Time.deltaTime;
-        }
-        else
-        {
-            // Mouse (PC) → delta ya es relativo al frame
-            lookX = lookInput.x * mouseSensitivity;
-            lookY = lookInput.y * mouseSensitivity;
-        }
-
-        verticalLookRotation -= lookY;
-        verticalLookRotation  = Mathf.Clamp(verticalLookRotation, -verticalLookRange, verticalLookRange);
-        cameraTransform.localRotation = Quaternion.Euler(verticalLookRotation, 0f, 0f);
-        transform.Rotate(Vector3.up * lookX);
-
-        // ── BOB + PASOS ──────────────────────────────────────────────
+        // BOB + PASOS
         bool isMoving = moveInput.sqrMagnitude > 0.01f && isGrounded;
 
         if (isMoving)
@@ -223,18 +130,61 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // Resto de métodos sin cambios (HandleCameraBob, ResetCameraBob, HandleFootsteps, PlayFootstep, OnDrawGizmosSelected)
+    private void HandleLook()
+    {
+        float lookX, lookY;
+
+        if (usingStick)
+        {
+            lookX = lookInput.x * gamepadSensitivity * Time.deltaTime;
+            lookY = lookInput.y * gamepadSensitivity * Time.deltaTime;
+        }
+        else
+        {
+            lookX = lookInput.x * mouseSensitivity;
+            lookY = lookInput.y * mouseSensitivity;
+        }
+
+        verticalLookRotation -= lookY;
+        verticalLookRotation = Mathf.Clamp(verticalLookRotation, -verticalLookRange, verticalLookRange);
+
+        cameraTransform.localRotation = Quaternion.Euler(verticalLookRotation, 0f, 0f);
+        transform.Rotate(Vector3.up * lookX);
+    }
+
+    private void OnLookPerformed(InputAction.CallbackContext ctx)
+    {
+        string path = ctx.control.path.ToLowerInvariant();
+
+        if (isAndroidPlatform && (path.Contains("pointer") || path.Contains("mouse")))
+            return;
+
+        lookInput = ctx.ReadValue<Vector2>();
+        usingStick = path.Contains("stick");
+    }
+
+    private void OnLookCanceled(InputAction.CallbackContext ctx)
+    {
+        string path = ctx.control.path.ToLowerInvariant();
+
+        if (isAndroidPlatform && (path.Contains("pointer") || path.Contains("mouse")))
+            return;
+
+        lookInput = Vector2.zero;
+        usingStick = false;
+    }
+
     private void HandleCameraBob()
     {
-        float freq = sprintInput ? sprintBobFrequency  : walkBobFrequency;
+        float freq = sprintInput ? sprintBobFrequency : walkBobFrequency;
         float ampY = sprintInput ? sprintBobAmplitudeY : walkBobAmplitudeY;
         float ampX = sprintInput ? sprintBobAmplitudeX : walkBobAmplitudeX;
 
         bobTimer += Time.deltaTime * freq;
 
         Vector3 bobOffset = new Vector3(
-            Mathf.Cos(bobTimer * 0.5f)       * ampX,
-            Mathf.Abs(Mathf.Sin(bobTimer))   * ampY,
+            Mathf.Cos(bobTimer * 0.5f) * ampX,
+            Mathf.Abs(Mathf.Sin(bobTimer)) * ampY,
             0f
         );
 
@@ -272,7 +222,7 @@ public class PlayerMovement : MonoBehaviour
         if (footstepSource == null) return;
 
         AudioClip[] clips = sprintInput ? sprintStepClips : walkStepClips;
-        if (clips == null || clips.Length == 0) return;
+        if (clips.Length == 0) return;
 
         int index;
         do { index = Random.Range(0, clips.Length); }

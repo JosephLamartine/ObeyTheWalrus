@@ -11,9 +11,12 @@ public class PhoneInteractable : InteractableObject
     [SerializeField] private string close_Prompt = "Press [E] to Close";
     [SerializeField] private string close_SpanishPrompt = "[E] Cerrar Puerta";
 
+    private PhoneBehavior scriptBehavior;
+    
     private void Awake()
     {
         anim = GetComponent<Animator>();
+        scriptBehavior = GetComponent<PhoneBehavior>();
     }
 
     public override void Interact()
@@ -22,13 +25,17 @@ public class PhoneInteractable : InteractableObject
 
         if (canUseIt)
         {
+            if (GameManager.Instance.storyStep == 1)
+            {
+                DialogueManager.Instance.LoadScript(DialogueManager.Instance.jsonPhoneCall1);
+                DialogueManager.Instance.StartDialogue();
+                DisableInteract();
+                scriptBehavior.StopRingtone();
+                GameManager.Instance.UpdateStoryStep(2);
+            }
+            
             DisableInteract();
-            anim.SetTrigger("Interact");   
-        }
-        else
-        {
-            DialogueManager.Instance.LoadScript(DialogueManager.Instance.jsonBathroom);
-            DialogueManager.Instance.StartDialogue();
+            //anim.SetTrigger("Interact");   
         }
     }
 

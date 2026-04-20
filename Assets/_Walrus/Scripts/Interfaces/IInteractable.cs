@@ -14,6 +14,4 @@ public interface IInteractable
     InteractionType Type { get; } 
     float MaxInteractionDistance { get; } 
     bool CanInteract { get; }
-    
-    bool CanUseIt { get; }
 }

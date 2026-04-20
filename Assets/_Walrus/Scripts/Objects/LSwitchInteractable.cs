@@ -2,18 +2,18 @@ using UnityEngine;
 
 public class LSwitchInteractable : InteractableObject
 {
-    [Header("Prompt")]
-    [SerializeField] private string open_Prompt = "[E] to Turn Lights On";
-    [SerializeField] private string open_SpanishPrompt = "[E] Prender Luz";
-    [Space(15)]
-    [SerializeField] private string close_Prompt = "[E] to Turn Lights Off";
-    [SerializeField] private string close_SpanishPrompt = "[E] Apagar Luz";
     
-    [Header("Settings")]
+    [Header("ON/OFF Prompt")]
+    [SerializeField] private string ON_Prompt = "[E] to Turn Lights On";
+    [SerializeField] private string ON_SpanishPrompt = "[E] Prender Luz";
+    [Space(15)]
+    [SerializeField] private string OFF_Prompt = "[E] to Turn Lights Off";
+    [SerializeField] private string OFF_SpanishPrompt = "[E] Apagar Luz";
+    
+    [Header("Switch Settings")]
     public bool isOn = false;
 
     public string lightToSwitch = " ";
-
     public void Start()
     {
         if (isOn)
@@ -50,11 +50,11 @@ public class LSwitchInteractable : InteractableObject
         
         if (GameManager.Instance.language == GameManager.Language.English)
         {
-            interactionPrompt = close_Prompt;
+            interactionPrompt = OFF_Prompt;
         }
         else if (GameManager.Instance.language == GameManager.Language.Spanish)
         {
-            interactionPrompt = close_SpanishPrompt;   
+            interactionPrompt = OFF_SpanishPrompt;   
         }
     }
     
@@ -66,14 +66,14 @@ public class LSwitchInteractable : InteractableObject
         
         if (GameManager.Instance.language == GameManager.Language.English)
         {
-            interactionPrompt = open_Prompt;
+            interactionPrompt = ON_Prompt;
         }
         else if (GameManager.Instance.language == GameManager.Language.Spanish)
         {
-            interactionPrompt = open_SpanishPrompt;   
+            interactionPrompt = ON_SpanishPrompt;   
         }
     }
-
+    
     public override void EnableInteract()
     {
         base.EnableInteract();
