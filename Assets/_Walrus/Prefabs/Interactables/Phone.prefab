@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1175974825257726771}
   - component: {fileID: 5654983388889279386}
   - component: {fileID: 6233715760601053948}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Phone_handset
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -101,7 +101,7 @@ GameObject:
   - component: {fileID: 4502328930738470903}
   - component: {fileID: 8770972931605093208}
   - component: {fileID: 5161066100760791941}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Phone_base
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -193,7 +193,7 @@ GameObject:
   - component: {fileID: 9022408737628712030}
   - component: {fileID: 926938406887164272}
   - component: {fileID: 3067484491016938100}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Phone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -238,10 +238,6 @@ MonoBehaviour:
   indicator: 0
   indicatorsHandler: {fileID: 0}
   indicatorIndex: 0
-  open_Prompt: '[E] to Answer'
-  open_SpanishPrompt: '[E] Contestar'
-  close_Prompt: Press [E] to Close
-  close_SpanishPrompt: '[E] Cerrar Puerta'
 --- !u!114 &9022408737628712030
 MonoBehaviour:
   m_ObjectHideFlags: 0

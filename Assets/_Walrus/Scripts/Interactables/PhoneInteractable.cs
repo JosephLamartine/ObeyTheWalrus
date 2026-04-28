@@ -3,13 +3,6 @@ using UnityEngine;
 public class PhoneInteractable : InteractableObject
 {
     private Animator anim;
-    
-    [Header("Prompt")]
-    [SerializeField] private string open_Prompt = "[E] to Answer";
-    [SerializeField] private string open_SpanishPrompt = "[E] Contestar";
-    [Space(15)]
-    [SerializeField] private string close_Prompt = "Press [E] to Close";
-    [SerializeField] private string close_SpanishPrompt = "[E] Cerrar Puerta";
 
     private PhoneBehavior scriptBehavior;
     
@@ -31,6 +24,8 @@ public class PhoneInteractable : InteractableObject
                 DialogueManager.Instance.StartDialogue();
                 DisableInteract();
                 scriptBehavior.StopRingtone();
+                scriptBehavior.StartCall();
+                
                 GameManager.Instance.UpdateStoryStep(2);
             }
             

@@ -9,7 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7433078221190928189}
-  m_Layer: 0
+  - component: {fileID: 7230433471089072999}
+  - component: {fileID: 433355984242995833}
+  m_Layer: 3
   m_Name: Flashlight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2587743491819039397}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.97008425, z: -0, w: 0.24276868}
+  m_LocalRotation: {x: 0, y: -0.97008425, z: 0, w: 0.24276868}
   m_LocalPosition: {x: 5.59381, y: -0.17900002, z: 3.866}
   m_LocalScale: {x: 0.17799, y: 0.17799, z: 0.17799}
   m_ConstrainProportionsScale: 0
@@ -33,6 +35,48 @@ Transform:
   - {fileID: 1524723535490268216}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -151.9, z: 0}
+--- !u!65 &7230433471089072999
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2587743491819039397}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 3, y: 2, z: 2}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &433355984242995833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2587743491819039397}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b704fe25efafa7949b8d174176a7989a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FlashlightInteractable
+  interactionPrompt: '[E] Take Flashlight'
+  spanishPrompt: '[E] Agarrar Linterna'
+  maxDistance: 4
+  canInteract: 1
+  canUseIt: 1
+  interactionType: 1
+  indicator: 0
+  indicatorsHandler: {fileID: 0}
+  indicatorIndex: 0
 --- !u!1 &3611080651301700993
 GameObject:
   m_ObjectHideFlags: 0
@@ -44,7 +88,7 @@ GameObject:
   - component: {fileID: 1524723535490268216}
   - component: {fileID: 8232812460874740564}
   - component: {fileID: 728484187339654917}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Flashlight_low
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -134,7 +178,7 @@ GameObject:
   - component: {fileID: 8491188774955469899}
   - component: {fileID: 1608221037249134079}
   - component: {fileID: 9117517818285426345}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Button_low
   m_TagString: Untagged
   m_Icon: {fileID: 0}

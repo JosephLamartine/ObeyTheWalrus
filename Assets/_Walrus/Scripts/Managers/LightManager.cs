@@ -6,13 +6,16 @@ public class LightManager : MonoBehaviour
 {
     public static LightManager Instance { get; private set; }
 
-    [Header("Luces controladas (asignar en Inspector)")]
+    [Header("Luces controladas")]
     [SerializeField] private List<Light> allLights = new List<Light>();
     
     private Dictionary<string, Light> lightsByName = new Dictionary<string, Light>();
 
     [Header("Configuración")]
     public bool disableLightsOnAdditiveLoad = true;
+
+    public AudioClip sndSwitchOn;
+    public AudioClip sndSwitchOff;
 
     private void Awake()
     {
@@ -77,7 +80,10 @@ public class LightManager : MonoBehaviour
         if (lightsByName.TryGetValue(lightName, out Light light))
         {
             if (light != null)
+            {
                 light.enabled = true;
+                AudioManager.Instance.PlaySFX(sndSwitchOn);
+            }
         }
         else
         {
@@ -93,7 +99,10 @@ public class LightManager : MonoBehaviour
         if (lightsByName.TryGetValue(lightName, out Light light))
         {
             if (light != null)
+            {
                 light.enabled = false;
+                AudioManager.Instance.PlaySFX(sndSwitchOff);
+            }
         }
         else
         {

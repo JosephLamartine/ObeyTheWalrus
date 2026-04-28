@@ -1,40 +1,54 @@
 using UnityEngine;
+using System.Collections;
 
 public class FlashlightBehavior : MonoBehaviour
 {
-    [Header("Referencias")]
+    [Header("Light")]
     [SerializeField] private Light flashlightLight;
 
     [Header("Sway & Lag")]
     [SerializeField] private float swayAmount    = 0.04f;
     [SerializeField] private float swaySmoothing = 8f;
 
-    [Header("Bob al caminar")]
+    [Header("Walking Bob")]
     [SerializeField] private float bobFrequency  = 8f;
     [SerializeField] private float bobAmplitudeY = 0.015f;
     [SerializeField] private float bobAmplitudeX = 0.008f;
 
-    [Header("Batería")]
+    [Header("Raise / Lower")]
+    [SerializeField] private Vector3 hiddenOffset  = new Vector3(0f, -0.3f, 0f);
+    [SerializeField] private float   raiseDuration = 0.3f;  // segundos en subir
+    [SerializeField] private float   lowerDuration = 0.3f;  // segundos en bajar
+    [SerializeField] private float   hideDelay     = 2f;    // delay antes de bajar al apagar
+
+    [Header("Battery Settings")]
     [SerializeField] private float drainPerSecond = 0.015f;
+    
+    [Header("Sounds")]
+    [SerializeField] private AudioClip sndFlashlightOn;
+    [SerializeField] private AudioClip sndFlashlightOff;
+
 
     private Vector3 initialLocalPos;
-    private float bobTimer = 0f;
-    private CharacterController cc;
+    private Vector3 hiddenLocalPos;
 
+    private bool  isVisible = false; // true = arriba (con o sin luz)
+    private float bobTimer  = 0f;
+    private CharacterController cc;
     private PlayerInputActions inputActions;
-    private Vector2 lookInput; // para el sway sin Input.GetAxis
+    private Vector2 lookInput;
+    private Coroutine moveCoroutine;
 
     private void Awake()
     {
         inputActions = new PlayerInputActions();
-        
+
         inputActions.Player.Flashlight.performed += ctx =>
         {
             if (InventoryManager.Instance.hasFlashlight)
                 InventoryManager.Instance.ToggleFlashlight();
         };
 
-        // Reutilizamos el Look para el sway, sin depender de Input.GetAxis
         inputActions.Player.Look.performed += ctx => lookInput = ctx.ReadValue<Vector2>();
         inputActions.Player.Look.canceled  += ctx => lookInput = Vector2.zero;
     }
@@ -45,47 +59,103 @@ public class FlashlightBehavior : MonoBehaviour
     private void Start()
     {
         initialLocalPos = transform.localPosition;
+        hiddenLocalPos  = initialLocalPos + hiddenOffset;
+
+        transform.localPosition = hiddenLocalPos;
+
         cc = GetComponentInParent<CharacterController>();
 
-        // DEBUG
-        InventoryManager.Instance.PickupFlashlight();
+        InventoryManager.Instance.PickupFlashlight(); // DEBUG
 
         if (flashlightLight != null)
             flashlightLight.enabled = false;
 
-        InventoryManager.Instance.OnFlashlightToggled += SetLight;
+        InventoryManager.Instance.OnFlashlightToggled += OnToggle;
     }
 
     private void OnDestroy()
     {
         if (InventoryManager.Instance != null)
-            InventoryManager.Instance.OnFlashlightToggled -= SetLight;
+            InventoryManager.Instance.OnFlashlightToggled -= OnToggle;
     }
 
     private void Update()
     {
         if (!InventoryManager.Instance.hasFlashlight) return;
-
-        HandleSway();
-        HandleBob();
+        if (isVisible) // sway y bob solo cuando está arriba
+        {
+            HandleSway();
+            HandleBob();
+        }
         HandleDrain();
     }
 
+    // ── Toggle ────────────────────────────────────────────────
+    private void OnToggle(bool state)
+    {
+        if (state)
+        {
+            // Prender: sube → luego enciende la luz al llegar arriba
+            if (moveCoroutine != null) StopCoroutine(moveCoroutine);
+            moveCoroutine = StartCoroutine(RaiseAndLight());
+        }
+        else
+        {
+            // Apagar: apaga luz → espera delay → baja
+            if (flashlightLight != null) flashlightLight.enabled = false;
+            if (moveCoroutine != null) StopCoroutine(moveCoroutine);
+            moveCoroutine = StartCoroutine(WaitAndLower());
+        }
+    }
+
+    private IEnumerator RaiseAndLight()
+    {
+        isVisible = true;
+        yield return StartCoroutine(MoveTo(initialLocalPos, raiseDuration));
+        AudioManager.Instance.PlaySFX(sndFlashlightOn);
+        if (flashlightLight != null) flashlightLight.enabled = true;
+    }
+
+    private IEnumerator WaitAndLower()
+    {
+        // Espera con sway activo todavía
+        AudioManager.Instance.PlaySFX(sndFlashlightOff);
+        yield return new WaitForSeconds(hideDelay);
+        isVisible = false;
+        yield return StartCoroutine(MoveTo(hiddenLocalPos, lowerDuration));
+    }
+
+    // Mueve suavemente de donde está al target en 'duration' segundos
+    private IEnumerator MoveTo(Vector3 target, float duration)
+    {
+        Vector3 start   = transform.localPosition;
+        float   elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t  = Mathf.SmoothStep(0f, 1f, elapsed / duration);
+            transform.localPosition = Vector3.Lerp(start, target, t);
+            yield return null;
+        }
+
+        transform.localPosition = target;
+    }
+
+    // ── Sway ──────────────────────────────────────────────────
     private void HandleSway()
     {
+        Vector3 current    = transform.localPosition;
         Vector3 swayTarget = new Vector3(
             initialLocalPos.x - lookInput.x * swayAmount,
-            initialLocalPos.y - lookInput.y * swayAmount,
+            current.y,
             initialLocalPos.z
         );
 
-        transform.localPosition = Vector3.Lerp(
-            transform.localPosition,
-            swayTarget,
-            swaySmoothing * Time.deltaTime
-        );
+        transform.localPosition = Vector3.Lerp(current, swayTarget, swaySmoothing * Time.deltaTime);
     }
 
+    // ── Bob ───────────────────────────────────────────────────
     private void HandleBob()
     {
         bool isMoving = cc != null && cc.velocity.magnitude > 0.1f && cc.isGrounded;
@@ -93,33 +163,23 @@ public class FlashlightBehavior : MonoBehaviour
         if (isMoving)
         {
             bobTimer += Time.deltaTime * bobFrequency;
-
+            Vector3 current = transform.localPosition;
             transform.localPosition = new Vector3(
-                initialLocalPos.x + Mathf.Cos(bobTimer)            * bobAmplitudeX,
-                initialLocalPos.y + Mathf.Abs(Mathf.Sin(bobTimer)) * bobAmplitudeY,
+                initialLocalPos.x + Mathf.Cos(bobTimer) * bobAmplitudeX,
+                current.y,
                 initialLocalPos.z
             );
         }
         else
         {
             bobTimer = 0f;
-            transform.localPosition = Vector3.Lerp(
-                transform.localPosition,
-                initialLocalPos,
-                swaySmoothing * Time.deltaTime
-            );
         }
     }
 
+    // ── Drain ─────────────────────────────────────────────────
     private void HandleDrain()
     {
-        if (InventoryManager.Instance.IsFlashlightOn())
-            InventoryManager.Instance.DrainBattery(drainPerSecond * Time.deltaTime);
-    }
-
-    private void SetLight(bool state)
-    {
-        if (flashlightLight != null)
-            flashlightLight.enabled = state;
+        if (InventoryManager.Instance.flashlightOn)
+            InventoryManager.Instance.DrainBattery(drainPerSecond);
     }
 }

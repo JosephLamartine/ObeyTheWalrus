@@ -5,7 +5,7 @@ public class MainMenu : MonoBehaviour
 {
     public void ButtonNewGame()
     {
-        SceneManager.LoadScene("Entire_House");
+        SceneManager.LoadScene("House");
     }
 
 }
